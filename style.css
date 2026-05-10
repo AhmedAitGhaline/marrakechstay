@@ -1,0 +1,90 @@
+/* Ajouter à la fin du style.css existant */
+
+/* Reviews Carousel */
+.reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.reviews-stats {
+    margin-bottom: 10px;
+}
+
+.reviews-summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.big-rating {
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.reviews-carousel {
+    overflow: hidden;
+    position: relative;
+}
+
+.reviews-track {
+    display: flex;
+    transition: transform 0.3s ease;
+    gap: 30px;
+}
+
+.review-card-carousel {
+    flex: 0 0 calc(33.333% - 20px);
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+@media (max-width: 900px) {
+    .review-card-carousel {
+        flex: 0 0 calc(100% - 20px);
+    }
+}
+
+.carousel-nav {
+    display: flex;
+    gap: 10px;
+}
+
+.carousel-prev, .carousel-next {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.carousel-prev:hover, .carousel-next:hover {
+    border-color: #C9A03D;
+    color: #C9A03D;
+}
+
+/* Gallery thumbs */
+.gallery-thumbs {
+    margin-top: 10px;
+}
+
+.gallery-thumbs img {
+    width: 80px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: 0.2s;
+}
+
+.gallery-thumbs img.active, .gallery-thumbs img:hover {
+    opacity: 1;
+    border: 2px solid #C9A03D;
+}

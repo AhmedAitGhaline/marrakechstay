@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Marrakech Stay | Appartements de luxe à Marrakech</title>
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231a1a1a'/><circle cx='50' cy='40' r='20' fill='%23C9A03D'/><path d='M30 65 L70 65 L65 85 L35 85 Z' fill='%23C9A03D'/><text x='50' y='50' text-anchor='middle' fill='white' font-size='20' font-weight='bold'>MS</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; transition: background 0.3s, color 0.3s; }
+        
+        /* Dark Mode */
+        body.light { background: #ffffff; color: #1a1a1a; }
+        body.dark { background: #121212; color: #ffffff; }
+        
+        body.dark nav { background: #1e1e1e; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        body.dark .nav-links a { color: #e0e0e0; }
+        body.dark .nav-links a:hover, body.dark .nav-links a.active { color: #C9A03D; }
+        body.dark .apartment-card { background: #1e1e1e; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        body.dark .apartment-card .location { color: #aaa; }
+        body.dark .review-card-carousel { background: #1e1e1e; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        body.dark .review-card-carousel .text { color: #e0e0e0; }
+        body.dark .review-card-carousel .city { color: #aaa; }
+        body.dark .contact input, body.dark .contact textarea { background: #2a2a2a; border-color: #444; color: white; }
+        body.dark .contact-info i { background: #2a2a2a; color: #C9A03D; }
+        body.dark .modal-content { background: #1e1e1e; color: white; }
+        body.dark .modal-content input, body.dark .modal-content select, body.dark .modal-content textarea { background: #2a2a2a; border-color: #444; color: white; }
+        body.dark .carousel-prev, body.dark .carousel-next { background: #1e1e1e; border-color: #444; color: #e0e0e0; }
+        body.dark footer { background: #0a0a0a; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: white;
+            padding: 16px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+            transition: background 0.3s;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo { font-size: 24px; font-weight: 700; }
+        .gold { color: #C9A03D; }
+        .nav-links { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; }
+        .nav-links a { text-decoration: none; color: #333; font-weight: 500; transition: 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: #C9A03D; }
+        .admin-link { background: #1a1a1a; color: white !important; padding: 8px 16px; border-radius: 8px; }
+        body.dark .admin-link { background: #C9A03D; color: #1a1a1a !important; }
+        .chat-notif { position: relative; cursor: pointer; }
+        .chat-badge { position: absolute; top: -8px; right: -8px; background: #ff4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 50%; }
+        .mobile-menu { display: none; font-size: 24px; cursor: pointer; }
+        .theme-toggle-mobile { background: none; border: 1px solid #ddd; padding: 8px 12px; border-radius: 30px; cursor: pointer; margin-left: 10px; }
+        body.dark .theme-toggle-mobile { border-color: #444; color: white; }
+        .hero {
+            height: 550px;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            margin-top: 70px;
+        }
+        .hero-content h1 { font-size: 52px; margin-bottom: 20px; }
+        .hero-content p { font-size: 18px; margin-bottom: 30px; max-width: 600px; }
+        .btn-gold {
+            background: #C9A03D;
+            color: #1a1a1a;
+            padding: 14px 35px;
+            text-decoration: none;
+            border-radius: 40px;
+            font-weight: 600;
+            display: inline-block;
+            transition: 0.3s;
+        }
+        .btn-gold:hover { background: #b28a2d; transform: translateY(-2px); }
+        .apartments { padding: 70px 0; }
+        .section-title { text-align: center; font-size: 38px; margin-bottom: 50px; font-weight: 700; }
+        .apartments-wrapper { position: relative; }
+        .apartments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 30px;
+            transition: 0.3s;
+        }
+        .apartment-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .apartment-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
+        .apartment-card img { width: 100%; height: 260px; object-fit: cover; }
+        .apartment-card .info { padding: 20px; }
+        .apartment-card h3 { font-size: 20px; margin-bottom: 6px; }
+        .apartment-card .location { color: #666; font-size: 14px; margin-bottom: 8px; }
+        .apartment-card .price { font-size: 22px; font-weight: 700; color: #C9A03D; margin-top: 10px; }
+        .rating { color: #C9A03D; margin: 8px 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .rating-stars { letter-spacing: 2px; }
+        .rating-value { font-weight: 600; }
+        .review-count { color: #666; font-size: 13px; }
+        body.dark .review-count { color: #aaa; }
+        .apartment-nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+        }
+        .apartment-nav-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 18px;
+        }
+        .apartment-nav-btn:hover { border-color: #C9A03D; color: #C9A03D; background: #fff8e8; }
+        body.dark .apartment-nav-btn { background: #1e1e1e; border-color: #444; color: #e0e0e0; }
+        
+        .reviews { background: #faf9f8; padding: 70px 0; transition: background 0.3s; }
+        body.dark .reviews { background: #1a1a1a; }
+        .reviews-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 40px; }
+        .reviews-stats { margin-bottom: 10px; }
+        .reviews-summary { display: flex; align-items: center; gap: 12px; }
+        .big-rating { font-size: 36px; font-weight: 700; }
+        .reviews-carousel { overflow: hidden; position: relative; }
+        .reviews-track { display: flex; transition: transform 0.3s ease; gap: 30px; }
+        .review-card-carousel {
+            flex: 0 0 calc(33.333% - 20px);
+            background: white;
+            padding: 28px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .review-card-carousel .stars { color: #C9A03D; margin-bottom: 12px; font-size: 16px; }
+        .review-card-carousel .text { font-style: italic; margin-bottom: 18px; color: #333; line-height: 1.5; }
+        .review-card-carousel .name { font-weight: 700; margin-bottom: 4px; }
+        .review-card-carousel .city { color: #666; font-size: 13px; }
+        .carousel-nav { display: flex; gap: 12px; }
+        .carousel-prev, .carousel-next {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .carousel-prev:hover, .carousel-next:hover { border-color: #C9A03D; color: #C9A03D; background: #fff8e8; }
+        .add-review-btn {
+            display: block;
+            margin: 40px auto 0;
+            background: #C9A03D;
+            color: #1a1a1a;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .contact { padding: 70px 0; }
+        .contact-container { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+        .contact-info p { margin: 25px 0; display: flex; align-items: center; gap: 15px; font-size: 16px; }
+        .contact-info i { width: 35px; height: 35px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #C9A03D; }
+        .contact form { display: flex; flex-direction: column; gap: 18px; }
+        .contact input, .contact textarea { padding: 14px 18px; border: 1px solid #e0e0e0; border-radius: 12px; font-size: 14px; transition: 0.2s; }
+        .contact input:focus, .contact textarea:focus { outline: none; border-color: #C9A03D; }
+        .contact button { background: #C9A03D; border: none; padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .contact button:hover { background: #b28a2d; }
+        
+        /* Chat Widget */
+        .chat-widget {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        body.dark .chat-widget { background: #1e1e1e; }
+        .chat-widget.open { display: flex; }
+        .chat-header { background: #C9A03D; color: #1a1a1a; padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+        .chat-header button { background: none; border: none; font-size: 20px; cursor: pointer; }
+        .chat-messages { height: 350px; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #f5f5f5; }
+        body.dark .chat-messages { background: #2a2a2a; }
+        .chat-message { max-width: 80%; padding: 10px 14px; border-radius: 18px; font-size: 13px; }
+        .chat-message.client { background: #C9A03D; color: #1a1a1a; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .chat-message.admin { background: white; color: #333; align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        body.dark .chat-message.admin { background: #1e1e1e; color: #e0e0e0; }
+        .chat-input { display: flex; border-top: 1px solid #ddd; }
+        body.dark .chat-input { border-top-color: #444; }
+        .chat-input input { flex: 1; padding: 12px; border: none; outline: none; background: white; }
+        body.dark .chat-input input { background: #2a2a2a; color: white; }
+        .chat-input button { background: #C9A03D; border: none; padding: 12px 15px; cursor: pointer; }
+        .chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #C9A03D;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 999;
+            color: white;
+            font-size: 24px;
+        }
+        .support-toggle { bottom: 100px; background: #25D366; right: 20px; }
+        
+        /* Modal avis */
+        .modal-review {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 450px;
+        }
+        .modal-content input, .modal-content select, .modal-content textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        footer { background: #1a1a1a; color: white; text-align: center; padding: 35px 0; transition: background 0.3s; }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 20px;
+                text-align: center;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            body.dark .nav-links { background: #1e1e1e; }
+            .nav-links.show { display: flex; }
+            .mobile-menu { display: block; }
+            .hero-content h1 { font-size: 32px; }
+            .contact-container { grid-template-columns: 1fr; }
+            .review-card-carousel { flex: 0 0 calc(100% - 20px); }
+            .apartments-grid { grid-template-columns: 1fr; }
+            .chat-widget { width: 300px; right: 10px; bottom: 100px; }
+            .apartment-nav { margin-top: 20px; }
+            .hero { height: 400px; margin-top: 60px; }
+            .section-title { font-size: 28px; }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-content h1 { font-size: 24px; }
+            .hero-content p { font-size: 14px; }
+            .btn-gold { padding: 10px 25px; font-size: 14px; }
+            .apartment-card img { height: 200px; }
+            .review-card-carousel { padding: 20px; }
+        }
+    </style>
+</head>
+<body class="light">
+
+<nav>
+    <div class="nav-container">
+        <div class="logo">Marrakech <span class="gold">Stay</span></div>
+        <div class="nav-links">
+            <a href="index.html" class="active">Accueil</a>
+            <a href="#apartments">Appartements</a>
+            <a href="#reviews">Avis</a>
+            <a href="#contact">Contact</a>
+            <div class="chat-notif" onclick="openChat()">
+                <i class="fas fa-comment-dots"></i>
+                <span class="chat-badge" id="chatNotificationCount" style="display:none;">0</span>
+            </div>
+            <a href="admin.html" class="admin-link"><i class="fas fa-user-shield"></i> Admin</a>
+            <button class="theme-toggle-mobile" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+        </div>
+        <div class="mobile-menu"><i class="fas fa-bars"></i></div>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>Appartements de luxe<br>à Marrakech</h1>
+        <p>Découvrez notre sélection d'appartements d'exception, alliant authenticité marocaine et confort moderne</p>
+        <a href="#apartments" class="btn-gold">Découvrir nos appartements</a>
+    </div>
+</section>
+
+<section id="apartments" class="apartments">
+    <div class="container">
+        <h2 class="section-title">Nos appartements</h2>
+        <div class="apartments-wrapper">
+            <div class="apartments-grid" id="apartmentsList"></div>
+            <div class="apartment-nav" id="apartmentNav" style="display: none;">
+                <button class="apartment-nav-btn" onclick="prevApartmentPage()"><i class="fas fa-chevron-left"></i></button>
+                <span id="apartmentPageInfo" style="margin: 0 15px; align-self: center;"></span>
+                <button class="apartment-nav-btn" onclick="nextApartmentPage()"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="reviews" class="reviews">
+    <div class="container">
+        <div class="reviews-header">
+            <div>
+                <h2 class="section-title" style="margin-bottom: 5px;">Ce que nos clients disent</h2>
+                <div id="reviewsStats"></div>
+            </div>
+            <div class="carousel-nav">
+                <button class="carousel-prev"><i class="fas fa-chevron-left"></i></button>
+                <button class="carousel-next"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+        <div class="reviews-carousel">
+            <div class="reviews-track" id="reviewsTrack"></div>
+        </div>
+        <button class="add-review-btn" onclick="openReviewModal()"><i class="fas fa-star"></i> Donner mon avis</button>
+    </div>
+</section>
+
+<section id="contact" class="contact">
+    <div class="container">
+        <h2 class="section-title">Contactez-nous</h2>
+        <div class="contact-container">
+            <div class="contact-info">
+                <p><i class="fas fa-phone"></i> +212 783509122</p>
+                <p><i class="fab fa-whatsapp"></i> WhatsApp: 0783509122</p>
+                <p><i class="fas fa-envelope"></i> contact@marrakechstay.com</p>
+                <p><i class="fas fa-map-marker-alt"></i> Marrakech, Maroc</p>
+            </div>
+            <form id="contactForm">
+                <input type="text" placeholder="Nom complet" id="contactName" required>
+                <input type="email" placeholder="Adresse email" id="contactEmail" required>
+                <textarea placeholder="Votre message" id="contactMsg" rows="4" required></textarea>
+                <button type="submit">Envoyer <i class="fab fa-whatsapp"></i></button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2025 Marrakech Stay - Location d'appartements de luxe à Marrakech</p>
+    </div>
+</footer>
+
+<!-- Chat Widget -->
+<div class="chat-widget" id="chatWidget">
+    <div class="chat-header">
+        <span><i class="fas fa-comment"></i> Support Marrakech Stay</span>
+        <button onclick="closeChat()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Écrivez votre message...">
+        <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+</div>
+
+<div class="chat-toggle" onclick="openChat()">
+    <i class="fas fa-comment-dots"></i>
+</div>
+
+<a href="https://wa.me/212783509122" class="chat-toggle support-toggle" style="background:#25D366; bottom: 100px;" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<!-- Modal Avis -->
+<div id="reviewModal" class="modal-review">
+    <div class="modal-content">
+        <h3>Donner mon avis</h3>
+        <input type="text" id="reviewNameInput" placeholder="Votre nom">
+        <input type="text" id="reviewCityInput" placeholder="Votre ville">
+        <select id="reviewRatingInput">
+            <option value="5">★★★★★ (5)</option>
+            <option value="4.5">★★★★½ (4.5)</option>
+            <option value="4">★★★★☆ (4)</option>
+            <option value="3.5">★★★½ (3.5)</option>
+            <option value="3">★★★☆☆ (3)</option>
+        </select>
+        <textarea id="reviewTextInput" rows="3" placeholder="Votre avis"></textarea>
+        <button onclick="submitReview()" style="background:#C9A03D; width:100%; padding:12px; border:none; border-radius:10px; font-weight:600;">Envoyer</button>
+        <button onclick="closeReviewModal()" style="width:100%; padding:10px; margin-top:10px; background:#ddd; border:none; border-radius:10px;">Annuler</button>
+    </div>
+</div>
+
+<script>
+    let apartments = [];
+    let reviews = [];
+    let privateReviews = [];
+    let currentReviewIndex = 0;
+    let currentClientId = null;
+    let apartmentCurrentPage = 0;
+    let apartmentsPerPage = 6;
+
+    function initData() {
+        const savedApartments = localStorage.getItem('apartments');
+        const savedReviews = localStorage.getItem('reviews');
+        const savedPrivateReviews = localStorage.getItem('privateReviews');
+        
+        if (savedApartments) {
+            apartments = JSON.parse(savedApartments);
+            // S'assurer que chaque appartement a les nouvelles propriétés
+            apartments.forEach(apt => {
+                if (!apt.bedrooms) apt.bedrooms = apt.bedrooms || Math.floor(Math.random() * 3) + 1;
+                if (!apt.bathrooms) apt.bathrooms = apt.bathrooms || Math.floor(Math.random() * 2) + 1;
+                if (!apt.beds) apt.beds = apt.beds || Math.floor(Math.random() * 4) + 1;
+                if (!apt.maxGuests) apt.maxGuests = apt.maxGuests || 4;
+                if (!apt.images) apt.images = apt.images || [];
+            });
+        } else {
+            apartments = [
+                { id: 1, name: "Villa d'Exception", location: "Palmeraie, Marrakech", price: 2500, maxGuests: 6, bedrooms: 3, bathrooms: 3, beds: 4, rating: 4.9, image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200", images: [], description: "Magnifique villa avec piscine privée", amenities: ["Piscine","Wifi","Climatisation"] },
+                { id: 2, name: "Riad de Charme", location: "Médina, Marrakech", price: 1800, maxGuests: 4, bedrooms: 2, bathrooms: 2, beds: 2, rating: 4.8, image: "https://images.unsplash.com/photo-1578645635734-9a5c8f0ab29d?w=1200", images: [], description: "Riad traditionnel au cœur de la Médina", amenities: ["Terrasse","Wifi","Climatisation"] },
+                { id: 3, name: "Appartement Vue Atlas", location: "Gueliz, Marrakech", price: 1200, maxGuests: 4, bedrooms: 2, bathrooms: 1, beds: 2, rating: 4.7, image: "https://images.unsplash.com/photo-1538688523618-a9f7ac3a7a8d?w=1200", images: [], description: "Vue imprenable sur l'Atlas", amenities: ["Balcon","Wifi","Climatisation"] },
+                { id: 4, name: "Luxueux Penthouse", location: "Hivernage, Marrakech", price: 3500, maxGuests: 8, bedrooms: 4, bathrooms: 3, beds: 5, rating: 5.0, image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=1200", images: [], description: "Penthouse de luxe avec terrasse privée", amenities: ["Piscine","Spa","Conciergerie"] }
+            ];
+        }
+        
+        if (savedReviews) {
+            reviews = JSON.parse(savedReviews);
+        } else {
+            reviews = [];
+        }
+        
+        privateReviews = savedPrivateReviews ? JSON.parse(savedPrivateReviews) : [];
+        
+        currentClientId = localStorage.getItem('clientId');
+        if (!currentClientId) {
+            currentClientId = 'client_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('clientId', currentClientId);
+        }
+    }
+
+    function getApartmentReviews(apartmentId) {
+        return privateReviews.filter(r => r.apartmentId === apartmentId);
+    }
+
+    function getApartmentRating(apartmentId) {
+        const aptReviews = getApartmentReviews(apartmentId);
+        if (aptReviews.length === 0) {
+            const apt = apartments.find(a => a.id === apartmentId);
+            return apt ? apt.rating : 4.5;
+        }
+        const sum = aptReviews.reduce((s, r) => s + r.rating, 0);
+        return (sum / aptReviews.length).toFixed(1);
+    }
+
+    function getRecentReviews(apartmentId, limit = 2) {
+        const aptReviews = getApartmentReviews(apartmentId);
+        return aptReviews.slice(-limit).reverse();
+    }
+
+    function displayApartments() {
+        const start = apartmentCurrentPage * apartmentsPerPage;
+        const end = start + apartmentsPerPage;
+        const displayedApts = apartments.slice(start, end);
+        const container = document.getElementById('apartmentsList');
+        if (!container) return;
+        
+        container.innerHTML = displayedApts.map(apt => {
+            const aptRating = getApartmentRating(apt.id);
+            const aptReviews = getApartmentReviews(apt.id);
+            const reviewCount = aptReviews.length;
+            const recentReviews = getRecentReviews(apt.id, 1);
+            
+            // Générer les étoiles
+            const fullStars = Math.floor(aptRating);
+            const hasHalfStar = aptRating % 1 >= 0.5;
+            let starsHtml = '★'.repeat(fullStars);
+            if (hasHalfStar) starsHtml += '½';
+            starsHtml += '☆'.repeat(5 - fullStars - (hasHalfStar ? 1 : 0));
+            
+            return `
+            <div class="apartment-card" onclick="viewApartment(${apt.id})">
+                <img src="${apt.image}" alt="${apt.name}" loading="lazy">
+                <div class="info">
+                    <h3>${apt.name}</h3>
+                    <div class="location">📍 ${apt.location}</div>
+                    <div class="rating">
+                        <span class="rating-stars">${starsHtml}</span>
+                        <span class="rating-value">${aptRating}</span>
+                        <span class="review-count"> · ${reviewCount} avis</span>
+                    </div>
+                    ${recentReviews.length > 0 ? `<div style="font-size: 12px; color: #666; margin: 8px 0; font-style: italic;">"${recentReviews[0].text.substring(0, 80)}${recentReviews[0].text.length > 80 ? '...' : ''}"</div>` : ''}
+                    <div class="price">${apt.price} MAD <span style="font-size:14px;">/ nuit</span></div>
+                </div>
+            </div>
+        `}).join('');
+        
+        const nav = document.getElementById('apartmentNav');
+        const pageInfo = document.getElementById('apartmentPageInfo');
+        if (apartments.length > apartmentsPerPage) {
+            nav.style.display = 'flex';
+            const totalPages = Math.ceil(apartments.length / apartmentsPerPage);
+            pageInfo.innerText = `Page ${apartmentCurrentPage + 1} / ${totalPages}`;
+        } else {
+            nav.style.display = 'none';
+        }
+    }
+    
+    function prevApartmentPage() {
+        if (apartmentCurrentPage > 0) {
+            apartmentCurrentPage--;
+            displayApartments();
+        }
+    }
+    
+    function nextApartmentPage() {
+        if ((apartmentCurrentPage + 1) * apartmentsPerPage < apartments.length) {
+            apartmentCurrentPage++;
+            displayApartments();
+        }
+    }
+
+    function viewApartment(id) {
+        window.location.href = `apartment.html?id=${id}`;
+    }
+
+    function updateReviewsCarousel() {
+        const visibleReviews = reviews.filter(r => r.visible !== false);
+        const total = visibleReviews.length;
+        const avgRating = total > 0 ? (visibleReviews.reduce((sum, r) => sum + r.rating, 0) / total).toFixed(1) : 0;
+        
+        const statsHtml = `
+            <div class="reviews-summary">
+                <span class="big-rating">${avgRating}</span>
+                <span class="stars">${'★'.repeat(Math.floor(avgRating))}${avgRating % 1 ? '½' : ''}</span>
+                <span class="review-count">· ${total} avis</span>
+            </div>
+        `;
+        const statsDiv = document.getElementById('reviewsStats');
+        if (statsDiv) statsDiv.innerHTML = statsHtml;
+        
+        const track = document.getElementById('reviewsTrack');
+        if (!track) return;
+        
+        const start = currentReviewIndex;
+        const displayReviewsArr = visibleReviews.slice(start, start + 3);
+        
+        track.innerHTML = displayReviewsArr.map(r => `
+            <div class="review-card-carousel">
+                <div class="stars">${'★'.repeat(Math.floor(r.rating))}</div>
+                <div class="text">"${r.text.substring(0, 150)}${r.text.length > 150 ? '...' : ''}"</div>
+                <div class="name">${r.name}</div>
+                <div class="city">${r.city}</div>
+            </div>
+        `).join('');
+    }
+
+    function nextReviews() {
+        const visibleReviews = reviews.filter(r => r.visible !== false);
+        if (currentReviewIndex + 3 < visibleReviews.length) {
+            currentReviewIndex += 3;
+        } else {
+            currentReviewIndex = 0;
+        }
+        updateReviewsCarousel();
+    }
+
+    function prevReviews() {
+        const visibleReviews = reviews.filter(r => r.visible !== false);
+        if (currentReviewIndex - 3 >= 0) {
+            currentReviewIndex -= 3;
+        } else {
+            currentReviewIndex = Math.max(0, visibleReviews.length - 3);
+        }
+        updateReviewsCarousel();
+    }
+
+    function openReviewModal() {
+        document.getElementById('reviewModal').style.display = 'flex';
+    }
+
+    function closeReviewModal() {
+        document.getElementById('reviewModal').style.display = 'none';
+        document.getElementById('reviewNameInput').value = '';
+        document.getElementById('reviewCityInput').value = '';
+        document.getElementById('reviewRatingInput').value = '5';
+        document.getElementById('reviewTextInput').value = '';
+    }
+
+    function submitReview() {
+        const name = document.getElementById('reviewNameInput').value;
+        const city = document.getElementById('reviewCityInput').value;
+        const rating = parseFloat(document.getElementById('reviewRatingInput').value);
+        const text = document.getElementById('reviewTextInput').value;
+        
+        if (!name || !city || !text) {
+            alert('Veuillez remplir tous les champs');
+            return;
+        }
+        
+        const newReview = {
+            id: Math.max(...reviews.map(r => r.id), 0) + 1,
+            name: name,
+            city: city,
+            rating: rating,
+            text: text,
+            visible: true,
+            date: new Date().toISOString().split('T')[0]
+        };
+        
+        reviews.push(newReview);
+        localStorage.setItem('reviews', JSON.stringify(reviews));
+        updateReviewsCarousel();
+        closeReviewModal();
+        alert('Merci pour votre avis !');
+    }
+
+    // Chat
+    function getClientConversations() {
+        let conversations = localStorage.getItem('clientConversations');
+        if (!conversations) {
+            conversations = {};
+            localStorage.setItem('clientConversations', JSON.stringify(conversations));
+            return {};
+        }
+        return JSON.parse(conversations);
+    }
+
+    function getMyMessages() {
+        const conversations = getClientConversations();
+        return conversations[currentClientId] || [];
+    }
+
+    function saveMyMessages(messages) {
+        const conversations = getClientConversations();
+        conversations[currentClientId] = messages;
+        localStorage.setItem('clientConversations', JSON.stringify(conversations));
+    }
+
+    function openChat() {
+        document.getElementById('chatWidget').classList.add('open');
+        localStorage.setItem(`chatLastRead_${currentClientId}`, Date.now());
+        document.getElementById('chatNotificationCount').style.display = 'none';
+        loadChatMessages();
+    }
+
+    function closeChat() {
+        document.getElementById('chatWidget').classList.remove('open');
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        if (!message) return;
+        
+        const messages = getMyMessages();
+        const newMessage = {
+            id: Date.now(),
+            sender: 'client',
+            senderName: 'Moi',
+            message: message,
+            timestamp: new Date().toISOString(),
+            read: false
+        };
+        
+        messages.push(newMessage);
+        saveMyMessages(messages);
+        loadChatMessages();
+        input.value = '';
+        localStorage.setItem('chatUpdated', Date.now().toString());
+    }
+
+    function loadChatMessages() {
+        const container = document.getElementById('chatMessages');
+        if (!container) return;
+        
+        const messages = getMyMessages();
+        container.innerHTML = messages.map(msg => `
+            <div class="chat-message ${msg.sender === 'client' ? 'client' : 'admin'}">
+                <strong>${msg.sender === 'client' ? 'Moi' : 'Support'}</strong><br>
+                ${msg.message}
+                <div style="font-size:10px; opacity:0.7; margin-top:5px;">${new Date(msg.timestamp).toLocaleTimeString()}</div>
+            </div>
+        `).join('');
+        
+        container.scrollTop = container.scrollHeight;
+        
+        const lastRead = localStorage.getItem(`chatLastRead_${currentClientId}`) || 0;
+        const unreadCount = messages.filter(m => m.sender === 'admin' && new Date(m.timestamp).getTime() > lastRead).length;
+        if (unreadCount > 0) {
+            document.getElementById('chatNotificationCount').style.display = 'inline-block';
+            document.getElementById('chatNotificationCount').textContent = unreadCount;
+        } else {
+            document.getElementById('chatNotificationCount').style.display = 'none';
+        }
+    }
+    
+    function toggleTheme() {
+        document.body.classList.toggle('light');
+        document.body.classList.toggle('dark');
+        localStorage.setItem('siteTheme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    setInterval(() => {
+        if (document.getElementById('chatWidget')?.classList.contains('open')) {
+            loadChatMessages();
+        } else {
+            const messages = getMyMessages();
+            const lastRead = localStorage.getItem(`chatLastRead_${currentClientId}`) || 0;
+            const unreadCount = messages.filter(m => m.sender === 'admin' && new Date(m.timestamp).getTime() > lastRead).length;
+            if (unreadCount > 0) {
+                document.getElementById('chatNotificationCount').style.display = 'inline-block';
+                document.getElementById('chatNotificationCount').textContent = unreadCount;
+            }
+        }
+    }, 5000);
+
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('contactName').value;
+            const email = document.getElementById('contactEmail').value;
+            const msg = document.getElementById('contactMsg').value;
+            
+            const messages = getMyMessages();
+            const supportMsg = {
+                id: Date.now(),
+                sender: 'client',
+                senderName: name,
+                message: `[CONTACT] ${name} (${email}): ${msg}`,
+                timestamp: new Date().toISOString(),
+                read: false
+            };
+            messages.push(supportMsg);
+            saveMyMessages(messages);
+            
+            alert('Message envoyé ! Vous serez contacté rapidement.');
+            contactForm.reset();
+        });
+    }
+
+    document.querySelector('.mobile-menu')?.addEventListener('click', () => {
+        document.querySelector('.nav-links').classList.toggle('show');
+    });
+
+    initData();
+    displayApartments();
+    updateReviewsCarousel();
+    document.querySelector('.carousel-prev')?.addEventListener('click', prevReviews);
+    document.querySelector('.carousel-next')?.addEventListener('click', nextReviews);
+    
+    const savedTheme = localStorage.getItem('siteTheme');
+    if (savedTheme === 'dark') document.body.classList.add('dark');
+    else document.body.classList.add('light');
+</script>
+</body>
+</html>
