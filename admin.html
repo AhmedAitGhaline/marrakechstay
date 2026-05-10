@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Admin - Marrakech Stay</title>
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231a1a1a'/><circle cx='50' cy='40' r='20' fill='%23C9A03D'/><path d='M30 65 L70 65 L65 85 L35 85 Z' fill='%23C9A03D'/><text x='50' y='50' text-anchor='middle' fill='white' font-size='20' font-weight='bold'>MS</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; transition: background 0.3s, color 0.3s; }
+        
+        /* Thèmes */
+        body.light { background: #f5f5f5; color: #1a1a1a; }
+        body.dark { background: #121212; color: #e0e0e0; }
+        
+        body.light .sidebar { background: #1a1a1a; }
+        body.dark .sidebar { background: #0a0a0a; }
+        
+        body.light .stat-card, body.light .data-table, body.light .apartment-admin-card,
+        body.light .payment-card-item, body.light .review-card-modern, body.light .modal-content,
+        body.light .chat-layout, body.light .client-item, body.light .calendar,
+        body.light .guest-selector, body.light .booking-summary, body.light .chart-card {
+            background: white;
+            color: #1a1a1a;
+        }
+        
+        body.dark .stat-card, body.dark .data-table, body.dark .apartment-admin-card,
+        body.dark .payment-card-item, body.dark .review-card-modern, body.dark .modal-content,
+        body.dark .chat-layout, body.dark .client-item, body.dark .calendar,
+        body.dark .guest-selector, body.dark .booking-summary, body.dark .chart-card {
+            background: #1e1e1e;
+            color: #e0e0e0;
+            border-color: #333;
+        }
+        
+        body.dark .data-table th { background: #2a2a2a; color: #e0e0e0; }
+        body.dark .data-table td { border-bottom-color: #333; }
+        body.dark .login-card { background: #1e1e1e; color: #e0e0e0; }
+        body.dark .login-input { background: #2a2a2a; border-color: #444; color: white; }
+        body.dark .form-group input, body.dark .form-group textarea, body.dark .form-group select { background: #2a2a2a; border-color: #444; color: white; }
+        body.dark .btn-cancel { background: #333; color: white; }
+        
+        /* Login */
+        .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); }
+        .login-card { border-radius: 32px; padding: 48px; width: 100%; max-width: 420px; text-align: center; }
+        .login-icon { font-size: 56px; color: #C9A03D; margin-bottom: 24px; }
+        .login-card h2 { font-size: 28px; margin-bottom: 8px; }
+        .login-card p { color: #666; margin-bottom: 32px; }
+        body.dark .login-card p { color: #aaa; }
+        .login-input { width: 100%; padding: 14px 16px; border: 1px solid #e0e0e0; border-radius: 16px; margin-bottom: 16px; font-size: 14px; }
+        .login-btn { width: 100%; background: #C9A03D; border: none; padding: 14px; border-radius: 16px; font-weight: 600; cursor: pointer; font-size: 16px; }
+        
+        /* Admin Layout */
+        .admin-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; padding: 32px 24px; position: fixed; height: 100vh; overflow-y: auto; transition: 0.3s; z-index: 100; }
+        .sidebar-logo { font-size: 24px; font-weight: 700; margin-bottom: 48px; text-align: center; color: white; }
+        .sidebar-logo span { color: #C9A03D; }
+        .sidebar-menu { list-style: none; }
+        .sidebar-menu li { margin-bottom: 8px; }
+        .sidebar-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #ccc; text-decoration: none; border-radius: 12px; transition: 0.2s; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: #C9A03D; color: #1a1a1a; }
+        
+        .main-content { margin-left: 280px; flex: 1; padding: 32px; }
+        .main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+        .header-actions { display: flex; gap: 12px; }
+        .theme-toggle, .logout-btn { background: transparent; border: 1px solid #ddd; padding: 10px 20px; border-radius: 30px; cursor: pointer; transition: 0.2s; }
+        .logout-btn:hover { background: #ff4444; color: white; border-color: #ff4444; }
+        
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-bottom: 32px; }
+        .stat-card { border-radius: 20px; padding: 24px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .stat-icon { width: 54px; height: 54px; background: rgba(201,160,61,0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #C9A03D; }
+        .stat-info h3 { font-size: 28px; font-weight: 700; }
+        .stat-info p { color: #666; font-size: 14px; }
+        body.dark .stat-info p { color: #aaa; }
+        
+        /* Dashboard Filters */
+        .dashboard-filters { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .period-btn { padding: 8px 20px; border-radius: 30px; border: 1px solid #ddd; background: transparent; cursor: pointer; transition: 0.2s; }
+        .period-btn.active { background: #C9A03D; border-color: #C9A03D; color: #1a1a1a; }
+        
+        /* Charts */
+        .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+        .chart-card { border-radius: 24px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .chart-card h4 { margin-bottom: 20px; }
+        
+        /* Tabs */
+        .tabs { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; border-bottom: 1px solid #eee; padding-bottom: 12px; }
+        .tab { background: none; border: none; padding: 10px 24px; border-radius: 30px; cursor: pointer; font-weight: 500; transition: 0.2s; }
+        .tab.active { background: #C9A03D; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Apartments */
+        .apartments-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .btn-add { background: #C9A03D; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .apartments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
+        .apartment-admin-card { border-radius: 20px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: 0.2s; }
+        .apartment-admin-img { height: 180px; background-size: cover; background-position: center; position: relative; }
+        .apartment-admin-badge { position: absolute; top: 12px; right: 12px; background: #C9A03D; color: #1a1a1a; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        
+        /* Nouveau style pour les infos rapides dans l'admin */
+        .apt-info-badge {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        body.dark .apt-info-badge { background: #333; }
+        
+        /* Data Tables */
+        .data-table { width: 100%; border-radius: 20px; overflow-x: auto; }
+        .data-table table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 16px; text-align: left; border-bottom: 1px solid #eee; }
+        .data-table th { background: #f9f9f9; font-weight: 600; }
+        body.dark .data-table th { background: #2a2a2a; }
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; display: inline-block; }
+        .status-confirmed { background: #4CAF50; color: white; }
+        .status-pending { background: #ff9800; color: white; }
+        .status-failed { background: #ff4444; color: white; }
+        
+        /* Payment Cards */
+        .payment-card-item { border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .payment-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+        .payment-card-details { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; background: rgba(0,0,0,0.02); padding: 16px; border-radius: 16px; margin-top: 12px; }
+        body.dark .payment-card-details { background: rgba(255,255,255,0.05); }
+        .btn-delete-payment { background: #ff4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+        .btn-delete-payment:hover { background: #cc0000; }
+        
+        /* Reviews */
+        .reviews-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 20px; }
+        .review-card-modern { border-radius: 20px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 20px; }
+        .review-rating { color: #C9A03D; margin-bottom: 12px; }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { border-radius: 28px; padding: 32px; width: 90%; max-width: 800px; max-height: 85vh; overflow-y: auto; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 8px; font-size: 14px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 16px; border: 1px solid #e0e0e0; border-radius: 16px; font-size: 14px; }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 24px; }
+        .btn-save { background: #C9A03D; flex: 1; padding: 14px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; }
+        .btn-cancel { background: #f0f0f0; flex: 1; padding: 14px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; }
+        
+        /* Amenities */
+        .amenities-modal-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-height: 300px; overflow-y: auto; padding: 16px; background: #f9f9f9; border-radius: 16px; margin-top: 10px; }
+        body.dark .amenities-modal-grid { background: #2a2a2a; }
+        .amenity-check { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 6px 8px; background: white; border-radius: 8px; border: 1px solid #eee; }
+        body.dark .amenity-check { background: #1e1e1e; border-color: #444; }
+        
+        /* Calendar */
+        .calendar-admin { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 16px 0; }
+        .cal-day-admin { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; background: #f5f5f5; font-size: 13px; }
+        body.dark .cal-day-admin { background: #2a2a2a; }
+        .cal-day-admin.booked { background: #ffebee; color: #d32f2f; text-decoration: line-through; }
+        body.dark .cal-day-admin.booked { background: #4a1414; color: #ff6666; }
+        
+        /* Image Upload */
+        .image-upload-area { border: 2px dashed #e0e0e0; border-radius: 16px; padding: 24px; text-align: center; cursor: pointer; margin-bottom: 16px; }
+        .image-preview { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+        .image-preview-item { width: 80px; height: 80px; border-radius: 12px; overflow: hidden; position: relative; }
+        .image-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .image-preview-item .remove-img { position: absolute; top: -8px; right: -8px; background: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
+        /* Chat */
+        .chat-layout { display: grid; grid-template-columns: 300px 1fr; gap: 24px; border-radius: 24px; overflow: hidden; min-height: 550px; }
+        .clients-list { border-right: 1px solid #eee; padding: 16px; overflow-y: auto; max-height: 550px; }
+        body.dark .clients-list { border-right-color: #333; }
+        .client-item { padding: 16px; border-radius: 16px; cursor: pointer; margin-bottom: 8px; }
+        .client-item:hover { background: rgba(201,160,61,0.1); }
+        .client-item.active { background: #C9A03D; color: white; }
+        .chat-area { display: flex; flex-direction: column; height: 550px; }
+        .chat-messages-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: #fafafa; }
+        body.dark .chat-messages-area { background: #1a1a1a; }
+        .chat-bubble { max-width: 70%; padding: 12px 16px; border-radius: 20px; font-size: 14px; }
+        .chat-bubble.client { background: #C9A03D; color: #1a1a1a; align-self: flex-start; }
+        .chat-bubble.admin { background: white; color: #333; align-self: flex-end; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        body.dark .chat-bubble.admin { background: #2a2a2a; color: #e0e0e0; }
+        .chat-input-area { display: flex; gap: 12px; padding: 16px; border-top: 1px solid #eee; }
+        body.dark .chat-input-area { border-top-color: #333; }
+        .chat-input-area input { flex: 1; padding: 12px 16px; border: 1px solid #e0e0e0; border-radius: 30px; outline: none; }
+        body.dark .chat-input-area input { background: #2a2a2a; border-color: #444; color: white; }
+        .chat-input-area button { background: #C9A03D; border: none; width: 46px; height: 46px; border-radius: 50%; cursor: pointer; }
+        
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); position: fixed; z-index: 1000; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .charts-row { grid-template-columns: 1fr; }
+            .chat-layout { grid-template-columns: 1fr; }
+            .amenities-modal-grid { grid-template-columns: repeat(2, 1fr); }
+            .form-row { grid-template-columns: 1fr; gap: 12px; }
+        }
+    </style>
+</head>
+<body class="light">
+
+<div id="loginContainer" class="login-container">
+    <div class="login-card">
+        <i class="fas fa-crown login-icon"></i>
+        <h2>Marrakech Stay</h2>
+        <p>Espace Administration</p>
+        <input type="text" id="adminUser" class="login-input" placeholder="Nom d'utilisateur">
+        <input type="password" id="adminPass" class="login-input" placeholder="Mot de passe">
+        <button class="login-btn" onclick="checkLogin()">Se connecter</button>
+    </div>
+</div>
+
+<div id="adminPanel" style="display: none;">
+    <div class="admin-container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-logo">Marrakech <span>Stay</span></div>
+            <ul class="sidebar-menu">
+                <li><a href="#" onclick="showTab('dashboard'); return false;" id="tabDashboard" class="active"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="#" onclick="showTab('apartments'); return false;" id="tabApartments"><i class="fas fa-building"></i> Appartements</a></li>
+                <li><a href="#" onclick="showTab('reviews'); return false;" id="tabReviews"><i class="fas fa-star"></i> Avis clients</a></li>
+                <li><a href="#" onclick="showTab('privateReviews'); return false;" id="tabPrivateReviews"><i class="fas fa-lock"></i> Avis privés</a></li>
+                <li><a href="#" onclick="showTab('bookings'); return false;" id="tabBookings"><i class="fas fa-calendar-check"></i> Réservations</a></li>
+                <li><a href="#" onclick="showTab('payments'); return false;" id="tabPayments"><i class="fas fa-credit-card"></i> Paiements</a></li>
+                <li><a href="#" onclick="showTab('chat'); return false;" id="tabChat"><i class="fas fa-comments"></i> Chat support</a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="main-header">
+                <button onclick="toggleSidebar()" style="display:none; background:none; border:none; font-size:24px; cursor:pointer;" id="menuToggle"><i class="fas fa-bars"></i></button>
+                <h1 id="pageTitle">Tableau de bord</h1>
+                <div class="header-actions">
+                    <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i> Thème</button>
+                    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+                </div>
+            </div>
+            
+            <!-- Dashboard -->
+            <div id="dashboardTab" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-building"></i></div><div class="stat-info"><h3 id="statApartments">0</h3><p>Appartements</p></div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-star"></i></div><div class="stat-info"><h3 id="statReviews">0</h3><p>Avis clients</p></div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><div class="stat-info"><h3 id="statBookings">0</h3><p>Réservations</p></div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-credit-card"></i></div><div class="stat-info"><h3 id="statPayments">0</h3><p>Paiements</p></div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-info"><h3 id="statRevenue">0</h3><p>Revenus (MAD)</p></div></div>
+                </div>
+                
+                <div class="dashboard-filters">
+                    <button class="period-btn" data-period="day">Par jour</button>
+                    <button class="period-btn" data-period="week">Par semaine</button>
+                    <button class="period-btn active" data-period="month">Par mois</button>
+                    <button class="period-btn" data-period="year">Par an</button>
+                </div>
+                
+                <div class="charts-row">
+                    <div class="chart-card"><h4><i class="fas fa-chart-line"></i> Évolution des réservations</h4><canvas id="bookingsChart" width="400" height="250"></canvas></div>
+                    <div class="chart-card"><h4><i class="fas fa-chart-pie"></i> Répartition par appartement</h4><canvas id="pieChart" width="400" height="250"></canvas></div>
+                </div>
+                
+                <div style="border-radius: 24px; padding: 24px; margin-top: 20px;">
+                    <h3 style="margin-bottom: 16px;"><i class="fas fa-clock"></i> Réservations récentes</h3>
+                    <div class="data-table">
+                        <table style="width:100%">
+                            <thead><tr><th>Client</th><th>Appartement</th><th>Dates</th><th>Montant</th><th>Statut</th></tr></thead>
+                            <tbody id="recentBookings"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Appartements -->
+            <div id="apartmentsTab" class="tab-content">
+                <div class="apartments-header">
+                    <h2>Gestion des appartements</h2>
+                    <button class="btn-add" onclick="openApartmentModal()"><i class="fas fa-plus"></i> Ajouter un appartement</button>
+                </div>
+                <div class="apartments-grid" id="apartmentsGrid"></div>
+            </div>
+            
+            <!-- Avis généraux -->
+            <div id="reviewsTab" class="tab-content">
+                <div class="apartments-header">
+                    <h2>Gestion des avis clients</h2>
+                    <button class="btn-add" onclick="openReviewModal()"><i class="fas fa-plus"></i> Ajouter un avis</button>
+                </div>
+                <div class="reviews-grid" id="reviewsList"></div>
+            </div>
+            
+            <!-- Avis privés par appartement -->
+            <div id="privateReviewsTab" class="tab-content">
+                <h2 style="margin-bottom: 20px;">Avis privés par appartement</h2>
+                <div class="apartments-header">
+                    <select id="privateReviewAptSelect" class="form-group" style="width: auto; padding: 10px;">
+                        <option value="">Sélectionner un appartement</option>
+                    </select>
+                    <button class="btn-add" onclick="openPrivateReviewModal()"><i class="fas fa-plus"></i> Ajouter avis privé</button>
+                </div>
+                <div id="privateReviewsList" class="reviews-grid"></div>
+            </div>
+            
+            <!-- Réservations -->
+            <div id="bookingsTab" class="tab-content">
+                <h2 style="margin-bottom: 20px;">Gestion des réservations</h2>
+                <div class="data-table">
+                    <table style="width:100%">
+                        <thead><tr><th>Client</th><th>Appartement</th><th>Dates</th><th>Voyageurs</th><th>Total</th><th>Statut</th><th>Actions</th></tr></thead>
+                        <tbody id="bookingsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Paiements -->
+            <div id="paymentsTab" class="tab-content">
+                <h2 style="margin-bottom: 20px;">Transactions par carte bancaire</h2>
+                <div id="paymentsList" class="payments-list"></div>
+            </div>
+            
+            <!-- Chat -->
+            <div id="chatTab" class="tab-content">
+                <h2 style="margin-bottom: 20px;">Support client</h2>
+                <div class="chat-layout">
+                    <div class="clients-list" id="clientsList"></div>
+                    <div class="chat-area">
+                        <div id="selectedClientInfo" style="padding: 16px; border-bottom: 1px solid #eee; font-weight: 600;"></div>
+                        <div class="chat-messages-area" id="chatMessagesArea"></div>
+                        <div class="chat-input-area">
+                            <input type="text" id="adminChatInput" placeholder="Écrivez votre message...">
+                            <button onclick="sendAdminMessage()"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Appartement avec nouveaux champs -->
+<div id="apartmentModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Ajouter un appartement</h3>
+        <input type="hidden" id="editId">
+        <div class="form-group"><label>Nom</label><input type="text" id="aptName" placeholder="Ex: Villa d'Exception"></div>
+        <div class="form-group"><label>Localisation</label><input type="text" id="aptLocation" placeholder="Ex: Palmeraie, Marrakech"></div>
+        <div class="form-group"><label>Adresse (Google Maps)</label><input type="text" id="aptAddress" placeholder="Adresse complète"></div>
+        <div class="form-group"><label>Prix (MAD/nuit)</label><input type="number" id="aptPrice" placeholder="2500"></div>
+        
+        <!-- Nouvelle section: Informations du logement -->
+        <h4 style="margin: 20px 0 10px 0; font-size: 16px;">Informations du logement</h4>
+        <div class="form-row">
+            <div class="form-group"><label>🛏️ Chambres</label><input type="number" id="aptBedrooms" placeholder="Ex: 3" value="2"></div>
+            <div class="form-group"><label>🚿 Salles de bains</label><input type="number" id="aptBathrooms" placeholder="Ex: 2" value="1"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>🛌 Lits</label><input type="number" id="aptBeds" placeholder="Ex: 4" value="2"></div>
+            <div class="form-group"><label>👥 Max voyageurs</label><input type="number" id="aptMaxGuests" placeholder="Ex: 6" value="4"></div>
+        </div>
+        
+        <div class="form-group"><label>Description</label><textarea id="aptDesc" rows="3" placeholder="Description détaillée..."></textarea></div>
+        
+        <div class="form-group"><label>Image principale</label>
+            <div class="image-upload-area" onclick="document.getElementById('mainImageInput').click()">
+                <i class="fas fa-cloud-upload-alt" style="font-size: 32px; color: #C9A03D;"></i>
+                <p>Cliquer pour télécharger</p>
+                <input type="file" id="mainImageInput" accept="image/*" style="display:none" onchange="previewMainImage(this)">
+            </div>
+            <div id="mainImagePreview" class="image-preview"></div>
+        </div>
+        
+        <div class="form-group"><label>Images secondaires</label>
+            <div class="image-upload-area" onclick="document.getElementById('secondaryImagesInput').click()">
+                <i class="fas fa-cloud-upload-alt" style="font-size: 32px; color: #C9A03D;"></i>
+                <p>Ajouter des images supplémentaires</p>
+                <input type="file" id="secondaryImagesInput" accept="image/*" multiple style="display:none" onchange="previewSecondaryImages(this)">
+            </div>
+            <div id="secondaryImagesPreview" class="image-preview"></div>
+        </div>
+        
+        <div class="form-group"><label>Équipements</label>
+            <div class="amenities-modal-grid" id="amenitiesCheckboxes"></div>
+        </div>
+        
+        <div class="modal-buttons">
+            <button class="btn-save" onclick="saveApartment()">Enregistrer</button>
+            <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Avis général -->
+<div id="reviewModal" class="modal">
+    <div class="modal-content">
+        <h3 id="reviewModalTitle">Ajouter un avis</h3>
+        <input type="hidden" id="reviewEditId">
+        <div class="form-group"><input type="text" id="reviewName" placeholder="Nom du client"></div>
+        <div class="form-group"><input type="text" id="reviewCity" placeholder="Ville"></div>
+        <div class="form-group">
+            <select id="reviewRating">
+                <option value="5">★★★★★ (5)</option>
+                <option value="4.5">★★★★½ (4.5)</option>
+                <option value="4">★★★★☆ (4)</option>
+                <option value="3.5">★★★½ (3.5)</option>
+                <option value="3">★★★☆☆ (3)</option>
+            </select>
+        </div>
+        <div class="form-group"><textarea id="reviewText" rows="3" placeholder="Texte de l'avis..."></textarea></div>
+        <div class="modal-buttons">
+            <button class="btn-save" onclick="saveReview()">Enregistrer</button>
+            <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Avis privé -->
+<div id="privateReviewModal" class="modal">
+    <div class="modal-content">
+        <h3 id="privateReviewModalTitle">Ajouter un avis privé</h3>
+        <input type="hidden" id="privateReviewEditId">
+        <input type="hidden" id="privateReviewAptId">
+        <div class="form-group"><label>Nom du client</label><input type="text" id="privateReviewName" placeholder="Nom du client"></div>
+        <div class="form-group"><label>Note</label><select id="privateReviewRating"><option value="5">★★★★★ (5)</option><option value="4.5">★★★★½ (4.5)</option><option value="4">★★★★☆ (4)</option><option value="3.5">★★★½ (3.5)</option><option value="3">★★★☆☆ (3)</option></select></div>
+        <div class="form-group"><label>Avis</label><textarea id="privateReviewText" rows="3" placeholder="Texte de l'avis..."></textarea></div>
+        <div class="form-group"><label>Photos</label>
+            <div class="image-upload-area" onclick="document.getElementById('privateReviewImagesInput').click()">
+                <i class="fas fa-cloud-upload-alt" style="font-size: 32px; color: #C9A03D;"></i>
+                <p>Ajouter des photos</p>
+                <input type="file" id="privateReviewImagesInput" accept="image/*" multiple style="display:none" onchange="previewPrivateReviewImages(this)">
+            </div>
+            <div id="privateReviewImagesPreview" class="image-preview"></div>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-save" onclick="savePrivateReview()">Enregistrer</button>
+            <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Données globales
+    let apartments = [], reviews = [], bookings = [], payments = [], privateReviews = [];
+    let currentPage = 1;
+    let revenueChart, pieChart;
+    let currentPeriod = 'month';
+    let selectedClientId = null;
+    let currentEditingApartment = null;
+    let currentMainImageFile = null;
+    let currentSecondaryImages = [];
+    let currentPrivateReviewImages = [];
+    
+    const allAmenities = ["Wifi", "Climatisation", "Chauffage", "Piscine", "Parking gratuit", "Parking payant", "Cuisine équipée", "Réfrigérateur", "Four", "Micro-ondes", "Machine à café", "Bouilloire", "Lave-linge", "Sèche-linge", "Fer à repasser", "Sèche-cheveux", "Linge de lit", "Serviettes", "Savon", "Shampoing", "Télévision", "Netflix", "Espace de travail", "Détecteur fumée", "Extincteur", "Boîte à clés", "Arrivée autonome", "Entrée privée", "Terrasse", "Balcon", "Jardin", "Animaux acceptés", "Ascenseur", "Conciergerie", "Transfert aéroport", "Petit-déjeuner"];
+    
+    // Initialisation des données
+    function initData() {
+        const savedApts = localStorage.getItem('apartments');
+        if (savedApts) {
+            apartments = JSON.parse(savedApts);
+            // Ajouter les nouveaux champs si absents
+            apartments.forEach(apt => {
+                if (!apt.bedrooms) apt.bedrooms = apt.bedrooms || 2;
+                if (!apt.bathrooms) apt.bathrooms = apt.bathrooms || 1;
+                if (!apt.beds) apt.beds = apt.beds || 2;
+                if (!apt.maxGuests) apt.maxGuests = apt.maxGuests || 4;
+            });
+        } else {
+            apartments = [
+                { id: 1, name: "Villa d'Exception", location: "Palmeraie, Marrakech", address: "Route de Fès", price: 2500, maxGuests: 6, bedrooms: 3, bathrooms: 3, beds: 4, rating: 4.9, image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600", images: [], description: "Magnifique villa avec piscine privée", bookedDates: [], amenities: ["Piscine","Wifi","Climatisation"] },
+                { id: 2, name: "Riad de Charme", location: "Médina, Marrakech", address: "Derb Lalla Chacha", price: 1800, maxGuests: 4, bedrooms: 2, bathrooms: 2, beds: 2, rating: 4.8, image: "https://images.unsplash.com/photo-1578645635734-9a5c8f0ab29d?w=600", images: [], description: "Riad traditionnel au cœur de la Médina", bookedDates: [], amenities: ["Terrasse","Wifi","Climatisation"] },
+                { id: 3, name: "Appartement Vue Atlas", location: "Gueliz, Marrakech", address: "Avenue Mohammed VI", price: 1200, maxGuests: 4, bedrooms: 2, bathrooms: 1, beds: 2, rating: 4.7, image: "https://images.unsplash.com/photo-1538688523618-a9f7ac3a7a8d?w=600", images: [], description: "Vue imprenable sur l'Atlas", bookedDates: [], amenities: ["Balcon","Wifi","Climatisation"] },
+                { id: 4, name: "Luxueux Penthouse", location: "Hivernage, Marrakech", address: "Rue Oued El Makhazine", price: 3500, maxGuests: 8, bedrooms: 4, bathrooms: 3, beds: 5, rating: 5.0, image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=600", images: [], description: "Penthouse de luxe avec terrasse privée", bookedDates: [], amenities: ["Piscine","Spa","Conciergerie"] }
+            ];
+            localStorage.setItem('apartments', JSON.stringify(apartments));
+        }
+        
+        const savedReviews = localStorage.getItem('reviews');
+        if (savedReviews) reviews = JSON.parse(savedReviews);
+        else {
+            reviews = [];
+            localStorage.setItem('reviews', JSON.stringify(reviews));
+        }
+        
+        const savedPrivateReviews = localStorage.getItem('privateReviews');
+        privateReviews = savedPrivateReviews ? JSON.parse(savedPrivateReviews) : [];
+        
+        const savedBookings = localStorage.getItem('bookings');
+        bookings = savedBookings ? JSON.parse(savedBookings) : [];
+        
+        const savedPayments = localStorage.getItem('payments');
+        payments = savedPayments ? JSON.parse(savedPayments) : [];
+        
+        updateStatsAndCharts();
+    }
+    
+    function updateStatsAndCharts() {
+        const visibleReviews = reviews.filter(r => r.visible);
+        const confirmedBookings = bookings.filter(b => b.status === 'confirmed');
+        const totalRevenue = confirmedBookings.reduce((sum, b) => sum + (b.total || 0), 0);
+        
+        document.getElementById('statApartments').innerText = apartments.length;
+        document.getElementById('statReviews').innerText = visibleReviews.length;
+        document.getElementById('statBookings').innerText = bookings.length;
+        document.getElementById('statPayments').innerText = payments.length;
+        document.getElementById('statRevenue').innerText = totalRevenue.toLocaleString();
+        
+        const recent = bookings.slice(-5).reverse();
+        document.getElementById('recentBookings').innerHTML = recent.map(b => `
+            <tr>
+                <td>${b.clientName || 'Client'}</td>
+                <td>${b.apartmentName}</td>
+                <td>${b.checkin} → ${b.checkout}</td>
+                <td>${b.total} MAD</td>
+                <td><span class="status-badge ${b.status === 'confirmed' ? 'status-confirmed' : b.status === 'failed' ? 'status-failed' : 'status-pending'}">${b.status === 'confirmed' ? 'Confirmée' : b.status === 'failed' ? 'Échoué' : 'En attente'}</span></td>
+            </tr>
+        `).join('');
+        
+        updateCharts();
+    }
+    
+    function updateCharts() {
+        const now = new Date();
+        let labels = [], data = [];
+        const confirmedBookings = bookings.filter(b => b.status === 'confirmed');
+        
+        if (currentPeriod === 'day') {
+            for (let i = 6; i >= 0; i--) {
+                let d = new Date();
+                d.setDate(d.getDate() - i);
+                labels.push(d.toLocaleDateString('fr', { weekday: 'short' }));
+                let count = confirmedBookings.filter(b => {
+                    let bDate = new Date(b.date);
+                    return bDate.toDateString() === d.toDateString();
+                }).length;
+                data.push(count);
+            }
+        } else if (currentPeriod === 'week') {
+            for (let i = 3; i >= 0; i--) {
+                let weekStart = new Date();
+                weekStart.setDate(weekStart.getDate() - (weekStart.getDay() || 7) + 1 - i*7);
+                let weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                labels.push(`Semaine du ${weekStart.getDate()}/${weekStart.getMonth()+1}`);
+                let count = confirmedBookings.filter(b => {
+                    let bDate = new Date(b.date);
+                    return bDate >= weekStart && bDate <= weekEnd;
+                }).length;
+                data.push(count);
+            }
+        } else if (currentPeriod === 'month') {
+            for (let i = 5; i >= 0; i--) {
+                let d = new Date();
+                d.setMonth(d.getMonth() - i);
+                labels.push(d.toLocaleDateString('fr', { month: 'short' }));
+                let count = confirmedBookings.filter(b => {
+                    let bDate = new Date(b.date);
+                    return bDate.getMonth() === d.getMonth() && bDate.getFullYear() === d.getFullYear();
+                }).length;
+                data.push(count);
+            }
+        } else {
+            for (let i = 2; i >= 0; i--) {
+                labels.push(now.getFullYear() - i);
+                let count = confirmedBookings.filter(b => new Date(b.date).getFullYear() === now.getFullYear() - i).length;
+                data.push(count);
+            }
+        }
+        
+        if (revenueChart) revenueChart.destroy();
+        const ctx = document.getElementById('bookingsChart').getContext('2d');
+        revenueChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels, datasets: [{ label: 'Réservations', data, borderColor: '#C9A03D', backgroundColor: 'rgba(201,160,61,0.1)', tension: 0.3, fill: true }] },
+            options: { responsive: true, maintainAspectRatio: true }
+        });
+        
+        const aptStats = {};
+        confirmedBookings.forEach(b => { aptStats[b.apartmentName] = (aptStats[b.apartmentName] || 0) + 1; });
+        const pieLabels = Object.keys(aptStats);
+        const pieData = Object.values(aptStats);
+        
+        if (pieChart) pieChart.destroy();
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        pieChart = new Chart(pieCtx, {
+            type: 'pie',
+            data: { labels: pieLabels, datasets: [{ data: pieData, backgroundColor: ['#C9A03D', '#e67e22', '#2ecc71', '#3498db', '#9b59b6', '#e74c3c'] }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+        });
+    }
+    
+    // Paiements
+    function loadPaymentsList() {
+        const container = document.getElementById('paymentsList');
+        if (!payments.length) {
+            container.innerHTML = '<div style="text-align:center; padding:60px; color:#999;">Aucun paiement effectué pour le moment</div>';
+            return;
+        }
+        container.innerHTML = payments.map((p, idx) => `
+            <div class="payment-card-item">
+                <div class="payment-card-header">
+                    <strong><i class="fas fa-user"></i> ${p.cardName || p.clientName || 'Client'}</strong>
+                    <button class="btn-delete-payment" onclick="deletePayment(${idx})"><i class="fas fa-trash"></i> Supprimer</button>
+                </div>
+                <div class="payment-card-details">
+                    <div><strong>💳 Numéro:</strong> <span style="font-family: monospace;">${p.cardNumber}</span></div>
+                    <div><strong>📅 Expiration:</strong> ${p.cardExpiry}</div>
+                    <div><strong>🔒 CVV:</strong> ${p.cardCvv}</div>
+                    <div><strong>👤 Nom sur la carte:</strong> ${p.cardName}</div>
+                    <div><strong>📍 Adresse:</strong> ${p.address || ''}</div>
+                    <div><strong>🌍 Pays:</strong> ${p.country || ''}</div>
+                    <div><strong>🏙️ Ville:</strong> ${p.city || ''}</div>
+                    <div><strong>📮 Code postal:</strong> ${p.postalCode || ''}</div>
+                    <div><strong>💰 Montant:</strong> ${p.amount} MAD</div>
+                    <div><strong>🏠 Appartement:</strong> ${p.apartmentName}</div>
+                    <div><strong>📅 Dates:</strong> ${p.checkin} → ${p.checkout}</div>
+                    <div><strong>🛎️ Frais de service:</strong> ${p.serviceFees || 0} MAD</div>
+                    <div><strong>📊 Taxe (10%):</strong> ${p.tax || 0} MAD</div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function deletePayment(index) {
+        if (confirm('Supprimer définitivement ce paiement ?')) {
+            payments.splice(index, 1);
+            localStorage.setItem('payments', JSON.stringify(payments));
+            loadPaymentsList();
+            updateStatsAndCharts();
+        }
+    }
+    
+    // Avis généraux
+    function loadReviewsList() {
+        const container = document.getElementById('reviewsList');
+        container.innerHTML = reviews.map(r => `
+            <div class="review-card-modern">
+                <div class="review-rating">${'★'.repeat(Math.floor(r.rating))}${r.rating % 1 ? '½' : ''} (${r.rating})</div>
+                <p style="margin: 12px 0; line-height: 1.6;">"${r.text}"</p>
+                <div><strong>${r.name}</strong> • ${r.city}</div>
+                <div style="font-size: 12px; color: #999; margin-top: 8px;">${r.date}</div>
+                <div style="display: flex; gap: 10px; margin-top: 16px;">
+                    <button onclick="editReview(${r.id})" style="background:#2196F3; color:white; border:none; padding:8px 16px; border-radius:10px; cursor:pointer;"><i class="fas fa-edit"></i> Modifier</button>
+                    <button onclick="deleteReview(${r.id})" style="background:#ff4444; color:white; border:none; padding:8px 16px; border-radius:10px; cursor:pointer;"><i class="fas fa-trash"></i> Supprimer</button>
+                    <button onclick="toggleReviewVisibility(${r.id})" style="background:${r.visible ? '#4CAF50' : '#ff9800'}; color:white; border:none; padding:8px 16px; border-radius:10px; cursor:pointer;">${r.visible ? '✓ Visible' : '✗ Masqué'}</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function toggleReviewVisibility(id) {
+        const review = reviews.find(r => r.id === id);
+        if (review) {
+            review.visible = !review.visible;
+            localStorage.setItem('reviews', JSON.stringify(reviews));
+            loadReviewsList();
+            updateStatsAndCharts();
+        }
+    }
+    
+    function openReviewModal() {
+        document.getElementById('reviewModalTitle').innerText = 'Ajouter un avis';
+        document.getElementById('reviewEditId').value = '';
+        document.getElementById('reviewName').value = '';
+        document.getElementById('reviewCity').value = '';
+        document.getElementById('reviewRating').value = '5';
+        document.getElementById('reviewText').value = '';
+        document.getElementById('reviewModal').style.display = 'flex';
+    }
+    
+    function editReview(id) {
+        const review = reviews.find(r => r.id === id);
+        if (review) {
+            document.getElementById('reviewModalTitle').innerText = 'Modifier l\'avis';
+            document.getElementById('reviewEditId').value = review.id;
+            document.getElementById('reviewName').value = review.name;
+            document.getElementById('reviewCity').value = review.city;
+            document.getElementById('reviewRating').value = review.rating;
+            document.getElementById('reviewText').value = review.text;
+            document.getElementById('reviewModal').style.display = 'flex';
+        }
+    }
+    
+    function saveReview() {
+        const id = document.getElementById('reviewEditId').value;
+        const newReview = {
+            id: id ? parseInt(id) : Math.max(...reviews.map(r => r.id), 0) + 1,
+            name: document.getElementById('reviewName').value,
+            city: document.getElementById('reviewCity').value,
+            rating: parseFloat(document.getElementById('reviewRating').value),
+            text: document.getElementById('reviewText').value,
+            visible: true,
+            date: new Date().toISOString().split('T')[0]
+        };
+        
+        if (id) {
+            const idx = reviews.findIndex(r => r.id === parseInt(id));
+            if (idx !== -1) reviews[idx] = newReview;
+        } else {
+            reviews.push(newReview);
+        }
+        
+        localStorage.setItem('reviews', JSON.stringify(reviews));
+        closeModal();
+        loadReviewsList();
+        updateStatsAndCharts();
+    }
+    
+    function deleteReview(id) {
+        if (confirm('Supprimer cet avis ?')) {
+            reviews = reviews.filter(r => r.id !== id);
+            localStorage.setItem('reviews', JSON.stringify(reviews));
+            loadReviewsList();
+            updateStatsAndCharts();
+        }
+    }
+    
+    // Avis privés
+    function loadPrivateReviewsList() {
+        const aptId = document.getElementById('privateReviewAptSelect').value;
+        const container = document.getElementById('privateReviewsList');
+        if (!aptId) {
+            container.innerHTML = '<div style="text-align:center; padding:60px; color:#999;">Sélectionnez un appartement</div>';
+            return;
+        }
+        const aptPrivateReviews = privateReviews.filter(r => r.apartmentId == aptId);
+        if (aptPrivateReviews.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:60px; color:#999;">Aucun avis privé pour cet appartement</div>';
+            return;
+        }
+        container.innerHTML = aptPrivateReviews.map(r => `
+            <div class="review-card-modern">
+                <div class="review-rating">${'★'.repeat(Math.floor(r.rating))}${r.rating % 1 ? '½' : ''} (${r.rating})</div>
+                <p style="margin: 12px 0; line-height: 1.6;">"${r.text}"</p>
+                <div><strong>${r.name}</strong></div>
+                <div style="font-size: 12px; color: #999; margin-top: 8px;">${r.date}</div>
+                ${r.images && r.images.length ? `<div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">${r.images.map(img => `<img src="${img}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; cursor: pointer;" onclick="window.open('${img}')">`).join('')}</div>` : ''}
+                <div style="display: flex; gap: 10px; margin-top: 16px;">
+                    <button onclick="editPrivateReview(${r.id})" style="background:#2196F3; color:white; border:none; padding:8px 16px; border-radius:10px; cursor:pointer;"><i class="fas fa-edit"></i> Modifier</button>
+                    <button onclick="deletePrivateReview(${r.id})" style="background:#ff4444; color:white; border:none; padding:8px 16px; border-radius:10px; cursor:pointer;"><i class="fas fa-trash"></i> Supprimer</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function populateApartmentSelect() {
+        const select = document.getElementById('privateReviewAptSelect');
+        select.innerHTML = '<option value="">Sélectionner un appartement</option>' + apartments.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+        select.onchange = () => loadPrivateReviewsList();
+    }
+    
+    function openPrivateReviewModal() {
+        const aptId = document.getElementById('privateReviewAptSelect').value;
+        if (!aptId) { alert('Sélectionnez d\'abord un appartement'); return; }
+        document.getElementById('privateReviewModalTitle').innerText = 'Ajouter un avis privé';
+        document.getElementById('privateReviewEditId').value = '';
+        document.getElementById('privateReviewAptId').value = aptId;
+        document.getElementById('privateReviewName').value = '';
+        document.getElementById('privateReviewRating').value = '5';
+        document.getElementById('privateReviewText').value = '';
+        document.getElementById('privateReviewImagesPreview').innerHTML = '';
+        currentPrivateReviewImages = [];
+        document.getElementById('privateReviewModal').style.display = 'flex';
+    }
+    
+    function editPrivateReview(id) {
+        const review = privateReviews.find(r => r.id === id);
+        if (review) {
+            document.getElementById('privateReviewModalTitle').innerText = 'Modifier avis privé';
+            document.getElementById('privateReviewEditId').value = review.id;
+            document.getElementById('privateReviewAptId').value = review.apartmentId;
+            document.getElementById('privateReviewName').value = review.name;
+            document.getElementById('privateReviewRating').value = review.rating;
+            document.getElementById('privateReviewText').value = review.text;
+            currentPrivateReviewImages = review.images || [];
+            const previewDiv = document.getElementById('privateReviewImagesPreview');
+            previewDiv.innerHTML = currentPrivateReviewImages.map((img, idx) => `<div class="image-preview-item"><img src="${img}"><div class="remove-img" onclick="removePrivateReviewImage(${idx})">×</div></div>`).join('');
+            document.getElementById('privateReviewModal').style.display = 'flex';
+        }
+    }
+    
+    function removePrivateReviewImage(index) {
+        currentPrivateReviewImages.splice(index, 1);
+        document.getElementById('privateReviewImagesPreview').innerHTML = currentPrivateReviewImages.map((img, idx) => `<div class="image-preview-item"><img src="${img}"><div class="remove-img" onclick="removePrivateReviewImage(${idx})">×</div></div>`).join('');
+    }
+    
+    function previewPrivateReviewImages(input) {
+        if (input.files) {
+            for (let file of input.files) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    currentPrivateReviewImages.push(e.target.result);
+                    const previewDiv = document.getElementById('privateReviewImagesPreview');
+                    previewDiv.innerHTML = currentPrivateReviewImages.map((img, idx) => `<div class="image-preview-item"><img src="${img}"><div class="remove-img" onclick="removePrivateReviewImage(${idx})">×</div></div>`).join('');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+    
+    function savePrivateReview() {
+        const id = document.getElementById('privateReviewEditId').value;
+        const aptId = parseInt(document.getElementById('privateReviewAptId').value);
+        const newReview = {
+            id: id ? parseInt(id) : Math.max(...privateReviews.map(r => r.id), 0) + 1,
+            apartmentId: aptId,
+            name: document.getElementById('privateReviewName').value,
+            rating: parseFloat(document.getElementById('privateReviewRating').value),
+            text: document.getElementById('privateReviewText').value,
+            images: currentPrivateReviewImages,
+            date: new Date().toISOString().split('T')[0]
+        };
+        
+        if (id) {
+            const idx = privateReviews.findIndex(r => r.id === parseInt(id));
+            if (idx !== -1) privateReviews[idx] = newReview;
+        } else {
+            privateReviews.push(newReview);
+        }
+        
+        localStorage.setItem('privateReviews', JSON.stringify(privateReviews));
+        closeModal();
+        loadPrivateReviewsList();
+    }
+    
+    function deletePrivateReview(id) {
+        if (confirm('Supprimer cet avis privé ?')) {
+            privateReviews = privateReviews.filter(r => r.id !== id);
+            localStorage.setItem('privateReviews', JSON.stringify(privateReviews));
+            loadPrivateReviewsList();
+        }
+    }
+    
+    // Réservations
+    function loadBookingsTable() {
+        const tbody = document.getElementById('bookingsTable');
+        tbody.innerHTML = bookings.map(b => `
+            <tr>
+                <td>${b.clientName || 'Client'}</td>
+                <td>${b.apartmentName}</td>
+                <td>${b.checkin} → ${b.checkout}</td>
+                <td>${(b.adults||0) + (b.children||0) + (b.infants||0)}</td>
+                <td>${b.total} MAD</td>
+                <td><span class="status-badge ${b.status === 'confirmed' ? 'status-confirmed' : b.status === 'failed' ? 'status-failed' : 'status-pending'}">${b.status === 'confirmed' ? 'Confirmée' : b.status === 'failed' ? 'Échoué' : 'En attente'}</span></td>
+                <td>
+                    ${b.status !== 'confirmed' && b.status !== 'failed' ? `<button onclick="confirmBooking(${b.id})" style="background:#4CAF50; color:white; border:none; padding:6px 12px; border-radius:8px; margin-right:5px;"><i class="fas fa-check"></i></button>` : ''}
+                    <button onclick="deleteBooking(${b.id})" style="background:#ff4444; color:white; border:none; padding:6px 12px; border-radius:8px;"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
+    
+    function confirmBooking(id) {
+        const booking = bookings.find(b => b.id === id);
+        if (booking) {
+            booking.status = 'confirmed';
+            const apt = apartments.find(a => a.id === booking.apartmentId);
+            if (apt) {
+                if (!apt.bookedDates) apt.bookedDates = [];
+                let current = new Date(booking.checkin);
+                const end = new Date(booking.checkout);
+                while (current < end) {
+                    const dateStr = current.toISOString().split('T')[0];
+                    if (!apt.bookedDates.includes(dateStr)) apt.bookedDates.push(dateStr);
+                    current.setDate(current.getDate() + 1);
+                }
+                localStorage.setItem('apartments', JSON.stringify(apartments));
+            }
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+            loadBookingsTable();
+            displayApartments();
+            updateStatsAndCharts();
+        }
+    }
+    
+    function deleteBooking(id) {
+        if (confirm('Supprimer cette réservation ?')) {
+            bookings = bookings.filter(b => b.id !== id);
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+            loadBookingsTable();
+            updateStatsAndCharts();
+        }
+    }
+    
+    // Appartements avec nouveaux champs
+    function displayApartments() {
+        const container = document.getElementById('apartmentsGrid');
+        container.innerHTML = apartments.map(apt => `
+            <div class="apartment-admin-card">
+                <div class="apartment-admin-img" style="background-image: url('${apt.image}')">
+                    <div class="apartment-admin-badge">${apt.price} MAD/nuit</div>
+                </div>
+                <div style="padding: 20px;">
+                    <h3>${apt.name}</h3>
+                    <div style="color: #666; font-size: 13px; margin-bottom: 10px;"><i class="fas fa-map-marker-alt"></i> ${apt.location}</div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="apt-info-badge"><i class="fas fa-bed"></i> ${apt.bedrooms || 2} ch</span>
+                        <span class="apt-info-badge"><i class="fas fa-bath"></i> ${apt.bathrooms || 1} sdb</span>
+                        <span class="apt-info-badge"><i class="fas fa-venus-mars"></i> ${apt.beds || 2} lits</span>
+                        <span class="apt-info-badge"><i class="fas fa-users"></i> ${apt.maxGuests || 4} pers</span>
+                    </div>
+                    <div style="color: #C9A03D; font-weight: 700; margin-bottom: 15px;">${apt.price} MAD / nuit</div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="editApartment(${apt.id})" style="background:#2196F3; color:white; border:none; padding:8px 16px; border-radius:10px; cursor:pointer;"><i class="fas fa-edit"></i> Modifier</button>
+                        <button onclick="deleteApartment(${apt.id})" style="background:#ff4444; color:white; border:none; padding:8px 16px; border-radius:10px; cursor:pointer;"><i class="fas fa-trash"></i> Supprimer</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function openApartmentModal() {
+        document.getElementById('modalTitle').innerText = 'Ajouter un appartement';
+        document.getElementById('editId').value = '';
+        document.getElementById('aptName').value = '';
+        document.getElementById('aptLocation').value = '';
+        document.getElementById('aptAddress').value = '';
+        document.getElementById('aptPrice').value = '';
+        document.getElementById('aptBedrooms').value = '2';
+        document.getElementById('aptBathrooms').value = '1';
+        document.getElementById('aptBeds').value = '2';
+        document.getElementById('aptMaxGuests').value = '4';
+        document.getElementById('aptDesc').value = '';
+        document.getElementById('mainImagePreview').innerHTML = '';
+        document.getElementById('secondaryImagesPreview').innerHTML = '';
+        currentMainImageFile = null;
+        currentSecondaryImages = [];
+        document.getElementById('amenitiesCheckboxes').innerHTML = allAmenities.map(am => `<label class="amenity-check"><input type="checkbox" value="${am}"> ${am}</label>`).join('');
+        document.getElementById('apartmentModal').style.display = 'flex';
+    }
+    
+    function editApartment(id) {
+        const apt = apartments.find(a => a.id === id);
+        if (apt) {
+            document.getElementById('modalTitle').innerText = 'Modifier l\'appartement';
+            document.getElementById('editId').value = apt.id;
+            document.getElementById('aptName').value = apt.name;
+            document.getElementById('aptLocation').value = apt.location;
+            document.getElementById('aptAddress').value = apt.address || '';
+            document.getElementById('aptPrice').value = apt.price;
+            document.getElementById('aptBedrooms').value = apt.bedrooms || 2;
+            document.getElementById('aptBathrooms').value = apt.bathrooms || 1;
+            document.getElementById('aptBeds').value = apt.beds || 2;
+            document.getElementById('aptMaxGuests').value = apt.maxGuests || 4;
+            document.getElementById('aptDesc').value = apt.description || '';
+            document.getElementById('amenitiesCheckboxes').innerHTML = allAmenities.map(am => `<label class="amenity-check"><input type="checkbox" value="${am}" ${apt.amenities?.includes(am) ? 'checked' : ''}> ${am}</label>`).join('');
+            document.getElementById('mainImagePreview').innerHTML = apt.image ? `<div class="image-preview-item"><img src="${apt.image}"></div>` : '';
+            document.getElementById('secondaryImagesPreview').innerHTML = (apt.images || []).map(img => `<div class="image-preview-item"><img src="${img}"></div>`).join('');
+            currentSecondaryImages = apt.images || [];
+            document.getElementById('apartmentModal').style.display = 'flex';
+        }
+    }
+    
+    function previewMainImage(input) {
+        if (input.files && input.files[0]) {
+            currentMainImageFile = input.files[0];
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('mainImagePreview').innerHTML = `<div class="image-preview-item"><img src="${e.target.result}"></div>`;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    function previewSecondaryImages(input) {
+        if (input.files) {
+            for (let file of input.files) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    currentSecondaryImages.push(e.target.result);
+                    const previewDiv = document.getElementById('secondaryImagesPreview');
+                    previewDiv.innerHTML = currentSecondaryImages.map(img => `<div class="image-preview-item"><img src="${img}"></div>`).join('');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+    
+    async function saveApartment() {
+        const id = document.getElementById('editId').value;
+        let mainImage = '';
+        if (currentMainImageFile) {
+            const reader = new FileReader();
+            mainImage = await new Promise(resolve => {
+                reader.onload = e => resolve(e.target.result);
+                reader.readAsDataURL(currentMainImageFile);
+            });
+        }
+        
+        const aptData = {
+            id: id ? parseInt(id) : Math.max(...apartments.map(a => a.id), 0) + 1,
+            name: document.getElementById('aptName').value,
+            location: document.getElementById('aptLocation').value,
+            address: document.getElementById('aptAddress').value,
+            price: parseInt(document.getElementById('aptPrice').value),
+            bedrooms: parseInt(document.getElementById('aptBedrooms').value),
+            bathrooms: parseInt(document.getElementById('aptBathrooms').value),
+            beds: parseInt(document.getElementById('aptBeds').value),
+            maxGuests: parseInt(document.getElementById('aptMaxGuests').value),
+            rating: 4.5,
+            image: mainImage || (id ? apartments.find(a => a.id === parseInt(id)).image : ''),
+            images: currentSecondaryImages,
+            description: document.getElementById('aptDesc').value,
+            amenities: Array.from(document.querySelectorAll('#amenitiesCheckboxes input:checked')).map(cb => cb.value),
+            bookedDates: id ? (apartments.find(a => a.id === parseInt(id))?.bookedDates || []) : []
+        };
+        
+        if (id) {
+            const idx = apartments.findIndex(a => a.id === parseInt(id));
+            if (idx !== -1) apartments[idx] = aptData;
+        } else {
+            apartments.push(aptData);
+        }
+        
+        localStorage.setItem('apartments', JSON.stringify(apartments));
+        closeModal();
+        displayApartments();
+        updateStatsAndCharts();
+        populateApartmentSelect();
+    }
+    
+    function deleteApartment(id) {
+        if (confirm('Supprimer cet appartement ?')) {
+            apartments = apartments.filter(a => a.id !== id);
+            localStorage.setItem('apartments', JSON.stringify(apartments));
+            displayApartments();
+            updateStatsAndCharts();
+            populateApartmentSelect();
+        }
+    }
+    
+    // Chat
+    function loadClientsList() {
+        const conv = JSON.parse(localStorage.getItem('clientConversations') || '{}');
+        const clients = Object.keys(conv);
+        document.getElementById('clientsList').innerHTML = clients.map(c => `
+            <div class="client-item ${selectedClientId === c ? 'active' : ''}" onclick="selectClient('${c}')">
+                <div class="client-name">Client ${c.substring(0,12)}...</div>
+            </div>
+        `).join('');
+        if (!clients.length) document.getElementById('clientsList').innerHTML = '<div style="padding:20px; text-align:center; color:#999;">Aucun client pour le moment</div>';
+    }
+    
+    function selectClient(cid) {
+        selectedClientId = cid;
+        loadClientsList();
+        document.getElementById('selectedClientInfo').innerHTML = `<i class="fas fa-user"></i> Client: ${cid.substring(0,20)}...`;
+        loadClientMessages();
+    }
+    
+    function loadClientMessages() {
+        if (!selectedClientId) return;
+        const conv = JSON.parse(localStorage.getItem('clientConversations') || '{}');
+        const msgs = conv[selectedClientId] || [];
+        document.getElementById('chatMessagesArea').innerHTML = msgs.map(msg => `
+            <div class="chat-bubble ${msg.sender}">
+                <strong>${msg.sender === 'client' ? 'Client' : 'Support'}</strong><br>
+                ${msg.message}
+                <div style="font-size: 10px; margin-top: 5px; opacity: 0.7;">${new Date(msg.timestamp).toLocaleString()}</div>
+            </div>
+        `).join('');
+        document.getElementById('chatMessagesArea').scrollTop = document.getElementById('chatMessagesArea').scrollHeight;
+    }
+    
+    function sendAdminMessage() {
+        const input = document.getElementById('adminChatInput');
+        const msg = input.value.trim();
+        if (!msg || !selectedClientId) return;
+        const conv = JSON.parse(localStorage.getItem('clientConversations') || '{}');
+        if (!conv[selectedClientId]) conv[selectedClientId] = [];
+        conv[selectedClientId].push({
+            id: Date.now(),
+            sender: 'admin',
+            senderName: 'Support',
+            message: msg,
+            timestamp: new Date().toISOString(),
+            read: false
+        });
+        localStorage.setItem('clientConversations', JSON.stringify(conv));
+        loadClientMessages();
+        input.value = '';
+    }
+    
+    // UI Helpers
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
+    
+    function closeModal() {
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    }
+    
+    function showTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
+        document.getElementById(`${tab}Tab`).classList.add('active');
+        
+        if (tab === 'dashboard') document.getElementById('tabDashboard').classList.add('active');
+        if (tab === 'apartments') { document.getElementById('tabApartments').classList.add('active'); displayApartments(); }
+        if (tab === 'reviews') { document.getElementById('tabReviews').classList.add('active'); loadReviewsList(); }
+        if (tab === 'privateReviews') { document.getElementById('tabPrivateReviews').classList.add('active'); populateApartmentSelect(); loadPrivateReviewsList(); }
+        if (tab === 'bookings') { document.getElementById('tabBookings').classList.add('active'); loadBookingsTable(); }
+        if (tab === 'payments') { document.getElementById('tabPayments').classList.add('active'); loadPaymentsList(); }
+        if (tab === 'chat') { document.getElementById('tabChat').classList.add('active'); loadClientsList(); }
+        
+        const titles = { dashboard: 'Tableau de bord', apartments: 'Appartements', reviews: 'Avis clients', privateReviews: 'Avis privés par appartement', bookings: 'Réservations', payments: 'Paiements carte', chat: 'Support client' };
+        document.getElementById('pageTitle').innerText = titles[tab];
+    }
+    
+    function toggleTheme() {
+        document.body.classList.toggle('light');
+        document.body.classList.toggle('dark');
+        localStorage.setItem('adminTheme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+    
+    function checkLogin() {
+        const u = document.getElementById('adminUser').value;
+        const p = document.getElementById('adminPass').value;
+        if (u === 'locationanagency' && p === 'admin1234') {
+            localStorage.setItem('adminLoggedIn', 'true');
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            initData();
+            displayApartments();
+            loadReviewsList();
+            loadBookingsTable();
+            loadPaymentsList();
+            loadClientsList();
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentPeriod = btn.dataset.period;
+                    updateCharts();
+                });
+            });
+            setInterval(() => { if (selectedClientId) loadClientMessages(); loadClientsList(); }, 5000);
+        } else {
+            alert('Identifiants incorrects');
+        }
+    }
+    
+    function logout() {
+        localStorage.removeItem('adminLoggedIn');
+        location.reload();
+    }
+    
+    // Initialisation
+    if (localStorage.getItem('adminLoggedIn') === 'true') {
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        initData();
+        displayApartments();
+        loadReviewsList();
+        loadBookingsTable();
+        loadPaymentsList();
+        loadClientsList();
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentPeriod = btn.dataset.period;
+                updateCharts();
+            });
+        });
+        setInterval(() => { if (selectedClientId) loadClientMessages(); loadClientsList(); }, 5000);
+    }
+    
+    const savedTheme = localStorage.getItem('adminTheme');
+    if (savedTheme === 'dark') document.body.classList.add('dark');
+    else document.body.classList.add('light');
+</script>
+</body>
+</html>
